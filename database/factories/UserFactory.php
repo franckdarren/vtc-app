@@ -12,12 +12,16 @@ use Laravel\Jetstream\Features;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
+
 class UserFactory extends Factory
 {
     /**
      * The current password being used by the factory.
      */
-    protected static ?string $password;
+
+    protected $model = User::class;
+
+    protected static ?string $password = null;
 
     /**
      * Define the model's default state.
@@ -26,17 +30,35 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        // Définir un rôle aléatoire entre 'client' et 'conducteur'
+        $role = $this->faker->randomElement(['client', 'conducteur']);
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->safeEmail,
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
+            'password' => bcrypt('password'), // mot de passe par défaut pour les tests
+            'role' => $role,
             'remember_token' => Str::random(10),
-            'profile_photo_path' => null,
             'current_team_id' => null,
+            'profile_photo_path' => null,
         ];
+    }
+
+    // Factory pour un client
+    public function client()
+    {
+        return $this->state(fn() => [
+            'role' => 'client',
+        ]);
+    }
+
+    // Factory pour un conducteur
+    public function conducteur()
+    {
+        return $this->state(fn() => [
+            'role' => 'conducteur',
+        ]);
     }
 
     /**
@@ -44,7 +66,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -60,8 +82,8 @@ class UserFactory extends Factory
 
         return $this->has(
             Team::factory()
-                ->state(fn (array $attributes, User $user) => [
-                    'name' => $user->name.'\'s Team',
+                ->state(fn(array $attributes, User $user) => [
+                    'name' => $user->name . '\'s Team',
                     'user_id' => $user->id,
                     'personal_team' => true,
                 ])

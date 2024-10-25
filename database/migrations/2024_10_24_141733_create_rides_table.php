@@ -16,8 +16,12 @@ return new class extends Migration
             $table->foreignId('rider_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('driver_id')->constrained('drivers')->onDelete('cascade');
             $table->foreignId('vehicle_id')->constrained('vehicles')->onDelete('cascade');
-            $table->float('start_location');
-            $table->float('end_location');
+            $table->float('latitude_start_location');
+            $table->float('longitude_start_location');
+
+            $table->float('latitude_end_location');
+            $table->float('longitude_end_location');
+
             $table->enum('status', ['pending', 'accepted', 'completed', 'canceled']);
             $table->float('distance');
             $table->decimal('price', 8, 2);

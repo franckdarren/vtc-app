@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Driver;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 
 class VehicleController extends Controller
 {
@@ -94,5 +96,15 @@ class VehicleController extends Controller
         $vehicle->delete();
 
         return response()->json(['message' => 'Véhicule supprimé'], Response::HTTP_OK);
+    }
+
+    public function availableVehicles(): JsonResponse
+    {
+        // Récupérer tous les chauffeurs disponibles avec leur véhicule
+        $drivers = Driver::where('availability_status', 1) // Filtre pour les chauffeurs disponibles
+            ->with('vehicle') // Charge le véhicule associé
+            ->get();
+
+        return response()->json($drivers);
     }
 }

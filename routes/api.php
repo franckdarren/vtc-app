@@ -23,6 +23,9 @@ Route::middleware('auth:sanctum')->group(function () {
 // Recupérer toutes les courses d'un utilisateur
 Route::middleware('auth:sanctum')->get('/user/rides/history', [UserController::class, 'rideHistory']);
 
+// Récupérer touts les conducteurs disponibles
+Route::get('/available-vehicles', [VehicleController::class, 'availableVehicles']);
+
 // Gestion des conducteurs
 Route::apiResource('drivers', DriverController::class);
 

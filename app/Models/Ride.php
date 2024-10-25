@@ -14,8 +14,11 @@ class Ride extends Model
         'rider_id',
         'driver_id',
         'vehicle_id',
-        'start_location',
-        'end_location',
+        'latitude_start_location',
+        'longitude_start_location',
+        'latitude_end_location',
+        'longitude_end_location',
+
         'status',
         'distance',
         'price',

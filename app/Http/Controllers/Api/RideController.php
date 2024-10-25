@@ -23,24 +23,63 @@ class RideController extends Controller
      */
     public function store(Request $request)
     {
-        // Créer une nouvelle course
+        // Valider les données du requête
         $validated = $request->validate([
             'rider_id' => 'required|exists:users,id',
             'driver_id' => 'required|exists:drivers,id',
             'vehicle_id' => 'required|exists:vehicles,id',
-            'start_location' => 'required|numeric',
-            'end_location' => 'required|numeric',
+            'latitude_start_location' => 'required|numeric',
+            'longitude_start_location' => 'required|numeric',
+            'latitude_end_location' => 'required|numeric',
+            'longitude_end_location' => 'required|numeric',
             'status' => 'required|in:pending,accepted,completed,canceled',
-            'distance' => 'required|numeric',
-            'price' => 'required|numeric|between:0,9999.99',
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date',
         ]);
 
+        // Calculer la distance entre les points de départ et d'arrivée
+        $validated['distance'] = $this->calculateDistance(
+            $validated['latitude_start_location'],
+            $validated['longitude_start_location'],
+            $validated['latitude_end_location'],
+            $validated['longitude_end_location']
+        );
+
+        // Calculer le prix comme distance * 100
+        $validated['price'] = $validated['distance'] * 100;
+
+        // Créer une nouvelle course avec les données validées
         $ride = Ride::create($validated);
 
         return response()->json($ride, Response::HTTP_CREATED);
     }
+
+
+    /**
+     * Calculate the distance between two geographical points.
+     *
+     * @param float $lat1
+     * @param float $lon1
+     * @param float $lat2
+     * @param float $lon2
+     * @return float
+     */
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2): float
+    {
+        $earthRadius = 6371; // Rayon de la Terre en kilomètres
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c; // Retourne la distance en kilomètres
+    }
+
 
     /**
      * Display the specified resource.
@@ -73,8 +112,10 @@ class RideController extends Controller
             'rider_id' => 'exists:users,id',
             'driver_id' => 'exists:drivers,id',
             'vehicle_id' => 'exists:vehicles,id',
-            'start_location' => 'numeric',
-            'end_location' => 'numeric',
+            'latitude_start_location' => 'required|numeric',
+            'longitude_start_location' => 'required|numeric',
+            'latitude_end_location' => 'required|numeric',
+            'longitude_end_location' => 'required|numeric',
             'status' => 'in:pending,accepted,completed,canceled',
             'distance' => 'numeric',
             'price' => 'numeric|between:0,9999.99',
