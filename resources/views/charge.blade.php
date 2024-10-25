@@ -15,44 +15,44 @@
 
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        < <h2 class="text-2xl font-semibold text-center mb-6 text-gray-700">Paiement sécurisé</h2>
+        <h2 class="text-2xl font-semibold text-center mb-6 text-gray-700">Paiement sécurisé</h2>
 
-            <form action="/charge" method="POST" id="payment-form">
-                {{ csrf_field() }}
+        <form action="/charge" method="POST" id="payment-form">
+            {{ csrf_field() }}
 
-                <!-- Montant -->
-                <label for="amount" class="block text-gray-600 mb-1">Montant (en centimes) :</label>
-                <input type="text" name="amount" id="amount" placeholder="Ex : 5000" required
-                    class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- Montant -->
+            <label for="amount" class="block text-gray-600 mb-1">Montant (en centimes) :</label>
+            <input type="text" name="amount" id="amount" placeholder="Ex : 5000" required
+                class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-                <!-- Email -->
-                <label for="email" class="block text-gray-600 mb-1">Email :</label>
-                <input type="text" name="email" id="email" placeholder="Ex : exemple@email.com" required
-                    class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- Email -->
+            <label for="email" class="block text-gray-600 mb-1">Email :</label>
+            <input type="text" name="email" id="email" placeholder="Ex : exemple@email.com" required
+                class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-                <!-- Carte de paiement -->
-                <label for="card-element" class="block text-gray-600 mb-1">Carte de crédit ou de débit :</label>
-                <div id="card-element" class="p-2 border rounded-lg mb-4">
-                    <!-- Une Stripe Element sera insérée ici -->
-                </div>
+            <!-- Carte de paiement -->
+            <label for="card-element" class="block text-gray-600 mb-1">Carte de crédit ou de débit :</label>
+            <div id="card-element" class="p-2 border rounded-lg mb-4">
+                <!-- Une Stripe Element sera insérée ici -->
+            </div>
 
-                <!-- Logos des cartes acceptées -->
-                <div class="flex justify-center space-x-4 mb-4">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa"
-                        class="h-6">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg"
-                        alt="Mastercard" class="h-6">
-                </div>
+            <!-- Logos des cartes acceptées -->
+            <div class="flex justify-center space-x-4 mb-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa"
+                    class="h-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" alt="Mastercard"
+                    class="h-6">
+            </div>
 
-                <!-- Erreurs de formulaire -->
-                <div id="card-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
+            <!-- Erreurs de formulaire -->
+            <div id="card-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
 
-                <!-- Bouton de soumission -->
-                <button type="submit"
-                    class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200">
-                    Payer maintenant
-                </button>
-            </form>
+            <!-- Bouton de soumission -->
+            <button type="submit"
+                class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200">
+                Payer maintenant
+            </button>
+        </form>
     </div>
 
     <script>
