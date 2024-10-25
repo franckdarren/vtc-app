@@ -20,6 +20,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{id}', [UserController::class, 'destroy']); // Supprimer un utilisateur
 });
 
+// Recupérer toutes les courses d'un utilisateur
+Route::middleware('auth:sanctum')->get('/user/rides/history', [UserController::class, 'rideHistory']);
+
 // Gestion des conducteurs
 Route::apiResource('drivers', DriverController::class);
 

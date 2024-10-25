@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Ride;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -99,5 +101,25 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(['message' => 'Utilisateur supprimé avec succès'], 200);
+    }
+
+    // Récupère l'historique des courses d'un utilisateur client
+    public function rideHistory()
+    {
+        // Obtenir l'utilisateur actuellement connecté
+        $user = Auth::user();
+
+        // Vérifier si l'utilisateur est un client (rôle client)
+        if ($user->role !== 'client') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Récupérer les courses de l'utilisateur connecté
+        $rides = Ride::where('rider_id', $user->id)
+            ->with(['driver', 'vehicle']) // Charger les relations pour plus de détails
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($rides, 200);
     }
 }
