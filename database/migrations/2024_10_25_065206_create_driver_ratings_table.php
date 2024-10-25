@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicles', function (Blueprint $table) {
+        Schema::create('driver_ratings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('ride_id')->constrained('rides')->onDelete('cascade');
             $table->foreignId('driver_id')->constrained('drivers')->onDelete('cascade');
-            $table->string('marque');
-            $table->string('model');
-            $table->integer('year');
-            $table->string('license_plate')->unique();
-            $table->string('color');
+            $table->foreignId('rider_id')->constrained('users')->onDelete('cascade'); // pour identifier qui évalue
+            $table->integer('rating')->unsigned()->comment('Note du chauffeur, de 1 à 5');
+            $table->text('comment')->nullable()->comment('Commentaire optionnel du client');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicles');
+        Schema::dropIfExists('driver_ratings');
     }
 };
