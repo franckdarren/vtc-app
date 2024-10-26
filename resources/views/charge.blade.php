@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
@@ -11,6 +11,9 @@
 
     <!-- Tailwind CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
@@ -21,7 +24,7 @@
             {{ csrf_field() }}
 
             <!-- Montant -->
-            <label for="amount" class="block text-gray-600 mb-1">Montant (en centimes) :</label>
+            <label for="amount" class="block text-gray-600 mb-1">Montant (en FCFA) :</label>
             <input type="text" name="amount" id="amount" placeholder="Ex : 5000" required
                 class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
@@ -36,6 +39,8 @@
                 <!-- Une Stripe Element sera insérée ici -->
             </div>
 
+            <!-- Erreurs de formulaire -->
+            <div id="card-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
             <!-- Logos des cartes acceptées -->
             <div class="flex justify-center space-x-4 mb-4">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa"
@@ -43,77 +48,90 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" alt="Mastercard"
                     class="h-6">
             </div>
-
-            <!-- Erreurs de formulaire -->
-            <div id="card-errors" role="alert" class="text-red-500 text-sm mb-4"></div>
-
             <!-- Bouton de soumission -->
             <button type="submit"
                 class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200">
                 Payer maintenant
             </button>
         </form>
+
+
+
     </div>
 
     <script>
-        const stripe = Stripe('VOTRE_CLE_PUBLIQUE_STRIPE');
-        const elements = stripe.elements();
+        document.addEventListener("DOMContentLoaded", function() {
+            // Remplacez STRIPE_KEY par votre vraie clé API
+            const stripe = Stripe(
+                'pk_test_51QDqYoB4MEEl1CoLdfEPhjqI14OZbCm2HXzfRlQb96NBQvfMplEYZNxbhof63p7FFOo8e1532XnvdwvFaHceV8c100U5LoQb4b'
+            );
+            const elements = stripe.elements();
 
-        const style = {
-            base: {
-                color: "#32325d",
-                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-                fontSmoothing: "antialiased",
-                fontSize: "16px",
-                "::placeholder": {
-                    color: "#a0aec0"
+            const style = {
+                base: {
+                    color: "#32325d",
+                    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                    fontSmoothing: "antialiased",
+                    fontSize: "16px",
+                    "::placeholder": {
+                        color: "#a0aec0"
+                    }
+                },
+                invalid: {
+                    color: "#e63946",
+                    iconColor: "#e63946"
                 }
-            },
-            invalid: {
-                color: "#e63946",
-                iconColor: "#e63946"
-            }
-        };
+            };
 
-        const card = elements.create("card", {
-            style: style
-        });
-        card.mount("#card-element");
-
-        card.on("change", function(event) {
-            const displayError = document.getElementById("card-errors");
-            if (event.error) {
-                displayError.textContent = event.error.message;
-            } else {
-                displayError.textContent = "";
-            }
-        });
-
-        const form = document.getElementById("payment-form");
-        form.addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            stripe.createToken(card).then(function(result) {
-                if (result.error) {
-                    const errorElement = document.getElementById("card-errors");
-                    errorElement.textContent = result.error.message;
-                } else {
-                    stripeTokenHandler(result.token);
-                }
+            const card = elements.create("card", {
+                style: style
             });
-        });
+            card.mount("#card-element");
 
-        function stripeTokenHandler(token) {
+            card.on("change", function(event) {
+                const displayError = document.getElementById("card-errors");
+                displayError.textContent = event.error ? event.error.message : "";
+            });
+
             const form = document.getElementById("payment-form");
-            const hiddenInput = document.createElement("input");
-            hiddenInput.setAttribute("type", "hidden");
-            hiddenInput.setAttribute("name", "stripeToken");
-            hiddenInput.setAttribute("value", token.id);
-            form.appendChild(hiddenInput);
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
 
-            form.submit();
-        }
+                stripe.createToken(card).then(function(result) {
+                    if (result.error) {
+                        document.getElementById("card-errors").textContent = result.error.message;
+                    } else {
+                        stripeTokenHandler(result.token);
+                    }
+                });
+            });
+
+            function stripeTokenHandler(token) {
+                const form = document.getElementById("payment-form");
+                const hiddenInput = document.createElement("input");
+                hiddenInput.setAttribute("type", "hidden");
+                hiddenInput.setAttribute("name", "stripeToken");
+                hiddenInput.setAttribute("value", token.id);
+                form.appendChild(hiddenInput);
+
+                // Affiche SweetAlert2 avant de soumettre le formulaire
+                Swal.fire({
+                    title: 'Paiement réussi !',
+                    text: 'Votre paiement a été traité avec succès.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Soumet le formulaire après que l'utilisateur clique sur "OK"
+                    form.submit();
+
+                    // Redirige vers la même page après l'envoi
+                    window.location.reload(); // Recharger la page actuelle
+                });
+            }
+        });
     </script>
+
+
 </body>
 
 </html>
